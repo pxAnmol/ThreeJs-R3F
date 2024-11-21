@@ -15,7 +15,6 @@ All classes that inherit from the Object3D posses these properties like Perspect
 */
 
 
-
 const sizes = {
     width: 800,
     height: 600
