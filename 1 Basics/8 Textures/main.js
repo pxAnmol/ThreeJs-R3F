@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import colorTexture from '/textures/color.jpg'
+// import colorTexture from '/textures/color.jpg'
+// import colorTexture from '/textures/checkerboard-1024x1024.png'
+// import colorTexture from '/textures/checkerboard-8x8.png'
+import colorTexture from '/textures/minecraft.png'
+
 
 const canvas = document.querySelector('.webgl')
 const scene = new THREE.Scene();
@@ -25,11 +29,11 @@ window.addEventListener('resize', () => {
 
 Textures are basically images that will cover the surface of the geometries.
 
-Textures are of many types:
-
 * All textures described below are in /textures folder.
 
-- Color: It is the most basic type of texture. It is used to color the surface of the geometry and is applied on the geometry.
+Textures are of many types:
+
+-Color: It is the most basic type of texture. It is used to color the surface of the geometry and is applied on the geometry.
 
 -Alpha: It is used to control the transparency of the surface of the geometry. It is applied on the geometry. It is a grayscale image. The white part is visible and the black part is not visible.
 
@@ -87,7 +91,9 @@ loadingManager.onError = () => {
     console.log("Loading failed");
 }
 
+// If using the LoadingManager, we need to pass it to the TextureLoader
 const textureLoader = new THREE.TextureLoader(loadingManager);
+
 // const texture = textureLoader.load(
 //     colorTexture,
 //     () => {
@@ -100,6 +106,7 @@ const textureLoader = new THREE.TextureLoader(loadingManager);
 //         console.log("Texture loading failed");
 //     }
 // );
+
 const texture = textureLoader.load(colorTexture);
 
 
@@ -141,8 +148,51 @@ const material = new THREE.MeshBasicMaterial({ map: texture });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
+/*  FILTERING and MIPMAPPING
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1, 100);
+-Mipmapping is a technique that is used to reduce the amount of texture detail when the camera is far away from the object. It is used to improve the performance of the application.
+It consist of creating multiple versions of the texture with different resolutions. The texture with the highest resolution is used when the camera is close to the object. The texture with the lowest resolution is used when the camera is far away from the object, until we get a 1x1 pixel texture.
+All of this is handled internally by THREE.js and the GPU but we can choose the different filtering algorithms.
+
+1. Minification Filter: It happens when the pixel of the texture is smaller than the pixel of the screen. In other words, the texture is too big for the screen.
+
+We can change the minification filter by using the .minFilter property.
+
+When using the minFilter with the nearest filter, we don't need mipmapping, we can use the nearest filter. We can deactivate the mipmapping by using the .generateMipmaps property to false.
+
+* Use the checkerboard-1024x1024.png texture to see the difference.
+
+*/
+
+// texture.minFilter = THREE.NearestFilter;
+
+/*
+
+2. Magnification Filter: It happens when the pixel of the texture is bigger than the pixel of the screen. In other words, the texture is too small for the screen.
+
+* Use the checkerboard-8x8.png or minecraft.png texture to see the difference.
+
+*/
+
+texture.magFilter = THREE.NearestFilter;
+
+
+/*  TEXTURE FORMAT and OPTIMIZATION
+
+When preparing the texture, we need to keep these 3 things - 
+
+- The weight
+- The size
+- The data
+
+The users will have to download the texture and the data. We need to optimize the texture to reduce the weight and the size of the texture by using compression.
+
+Because we are using Mipmapping, we need the texture width and height to be a power of 2.
+
+Texture support transparency, so we can use the alpha channel to store the transparency of the texture using the .png format.
+*/
+
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.01, 100);
 camera.position.set(0, 0, 3); 
 
 const controls = new OrbitControls(camera, canvas)
