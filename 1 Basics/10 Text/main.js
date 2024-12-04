@@ -26,14 +26,14 @@ gui.close();
 // Loading the matcap
 
 const textureLoader = new THREE.TextureLoader();
-const matcapTexture1 = textureLoader.load("/matcaps/1.png");
-const matcapTexture2 = textureLoader.load("/matcaps/2.png");
-const matcapTexture3 = textureLoader.load("/matcaps/3.png");
-const matcapTexture4 = textureLoader.load("/matcaps/4.png");
-const matcapTexture5 = textureLoader.load("/matcaps/5.png");
-const matcapTexture6 = textureLoader.load("/matcaps/6.png");
-const matcapTexture7 = textureLoader.load("/matcaps/7.png");
-const matcapTexture8 = textureLoader.load("/matcaps/8.png");
+const matcapTexture1 = textureLoader.load("matcaps/1.png");
+const matcapTexture2 = textureLoader.load("matcaps/2.png");
+const matcapTexture3 = textureLoader.load("matcaps/3.png");
+const matcapTexture4 = textureLoader.load("matcaps/4.png");
+const matcapTexture5 = textureLoader.load("matcaps/5.png");
+const matcapTexture6 = textureLoader.load("matcaps/6.png");
+const matcapTexture7 = textureLoader.load("matcaps/7.png");
+const matcapTexture8 = textureLoader.load("matcaps/8.png");
 
 // Loading the font
 
@@ -42,7 +42,7 @@ const loader = new FontLoader();
 // This loader has a load method that takes a path to a font file and a callback function that will be called when the font is loaded.
 // Then we need to create a TextGeometry object that will be used to create the text mesh and add it to the scene.
 
-loader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
+loader.load("fonts/helvetiker_regular.typeface.json", (font) => {
   const minDistanceFromText = 5;
 
   const parameters = {
