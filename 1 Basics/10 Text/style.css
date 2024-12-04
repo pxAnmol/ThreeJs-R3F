@@ -1,0 +1,27 @@
+*, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  overflow: hidden;
+}
+
+.text {
+  color: #ffffff;
+  text-align: center;
+  font-size: 8px;
+  font-family: 'Arial', sans-serif;
+  font-weight: 500;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
