@@ -1,0 +1,17 @@
+*, body {
+  margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  overflow: hidden;
+}
+
+.lil-gui {
+  --font-size: 9px;
+}
