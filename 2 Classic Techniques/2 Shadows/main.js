@@ -8,21 +8,45 @@ const gui = new lil.GUI();
 
 const scene = new THREE.Scene();
 
+// Load the texture of the shadow
+const bakedShadow = new THREE.TextureLoader().load("assets/bakedShadow.jpg");
+
+const simpleShadow = new THREE.TextureLoader().load("assets/simpleShadow.jpg");
+
 const material = new THREE.MeshStandardMaterial();
 material.roughness = 0.7;
 material.side = THREE.DoubleSide;
-gui.add(material, "metalness").min(0).max(1).step(0.001).name("Material Metalness");
-gui.add(material, "roughness").min(0).max(1).step(0.001).name("Material Roughness");
+gui
+  .add(material, "metalness")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("Material Metalness");
+gui
+  .add(material, "roughness")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("Material Roughness");
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
 sphere.castShadow = true;
 
+// Use the MeshStandardMaterial on the plane when you want a simple projection of shadow from the light source, upon turning the caseShadow property of the rendered to true or when you want to use the alternative method to bake the shadow into the model.
+
 const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material);
+
+// Use the MeshBasicMaterial on the plane when you want to bake the shadow into the model.
+
+// const plane = new THREE.Mesh(
+//   new THREE.PlaneGeometry(5, 5),
+//   new THREE.MeshBasicMaterial({ map: bakedShadow })
+// );
+
 plane.receiveShadow = true;
 plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.5;
 scene.add(sphere, plane);
-
 
 /*  SHADOWS
 
@@ -68,11 +92,19 @@ There are different types of shadowMap algorithms:
 */
 
 // Lights
+
+// Ambient Light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-gui.add(ambientLight, "intensity").min(0).max(1).step(0.001).name("Ambient Light Intensity");
+gui
+  .add(ambientLight, "intensity")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("Ambient Light Intensity");
 
 scene.add(ambientLight);
 
+// Directional Light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.castShadow = true;
 
@@ -90,27 +122,172 @@ directionalLight.shadow.camera.right = 1;
 directionalLight.shadow.radius = 20;
 
 directionalLight.position.set(2, 2, -1);
-gui.add(directionalLight, "intensity").min(0).max(1).step(0.001).name("Directional Light Intensity");
-gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001).name("Directional Light X");
-gui.add(directionalLight.position, "y").min(0.5).max(5).step(0.001).name("Directional Light Y");
-gui.add(directionalLight.position, "z").min(-5).max(5).step(0.001).name("Directional Light Z");
+
+const directionalFolder = gui.addFolder("Directional Light");
+directionalFolder
+  .add(directionalLight, "intensity")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("Intensity");
+directionalFolder
+  .add(directionalLight.position, "x")
+  .min(-5)
+  .max(5)
+  .step(0.001)
+  .name("X");
+directionalFolder
+  .add(directionalLight.position, "y")
+  .min(0.5)
+  .max(5)
+  .step(0.001)
+  .name("Y");
+directionalFolder
+  .add(directionalLight.position, "z")
+  .min(-5)
+  .max(5)
+  .step(0.001)
+  .name("Z");
 scene.add(directionalLight);
 
 // This is a helper to visualize the shadow map of the directional light
-const directionalLightHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+const directionalLightHelper = new THREE.CameraHelper(
+  directionalLight.shadow.camera
+);
 scene.add(directionalLightHelper);
 directionalLightHelper.visible = false;
-gui.add(directionalLightHelper, "visible").name("Directional Light Helper");
+directionalFolder.add(directionalLightHelper, "visible").name("Helper");
+
+// Spot Light
+
+const spotLight = new THREE.SpotLight(0xffffff, 5, 10, Math.PI * 0.3, 0.6, 1);
+spotLight.castShadow = true;
+spotLight.position.set(-1, 2, 2);
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+spotLight.shadow.camera.far = 10;
+spotLight.shadow.camera.fov = 30;
+
+spotLight.target.position.set(0, 0, 0);
+scene.add(spotLight.target);
+scene.add(spotLight);
+
+// Create a folder for spotlight controls
+const spotLightFolder = gui.addFolder("Spotlight Controls");
+
+// Add controls for both position and target
+spotLightFolder
+  .add(spotLight, "intensity")
+  .min(0)
+  .max(5)
+  .step(0.1)
+  .name("Intensity");
+spotLightFolder
+  .add(spotLight.position, "x")
+  .min(-5)
+  .max(5)
+  .step(0.01)
+  .name("X");
+spotLightFolder
+  .add(spotLight.position, "y")
+  .min(0.5)
+  .max(5)
+  .step(0.01)
+  .name("Y");
+spotLightFolder
+  .add(spotLight.position, "z")
+  .min(-5)
+  .max(5)
+  .step(0.01)
+  .name("Z");
+
+const spotLightHelper = new THREE.CameraHelper(spotLight.shadow.camera);
+spotLightHelper.visible = false;
+spotLightFolder.add(spotLightHelper, "visible").name("Helper");
+scene.add(spotLightHelper);
+
+// Point Light
+
+const pointLight = new THREE.PointLight(0xffffff, 2);
+pointLight.castShadow = true;
+pointLight.position.set(-1.5, 1.5, 0);
+pointLight.shadow.mapSize.width = 1024;
+pointLight.shadow.mapSize.height = 1024;
+pointLight.shadow.camera.near = 0.1;
+pointLight.shadow.camera.far = 5;
+
+scene.add(pointLight);
+
+// Add a folder for point light controls
+const pointLightFolder = gui.addFolder("Point Light Controls");
+pointLightFolder
+  .add(pointLight, "intensity")
+  .min(0)
+  .max(3)
+  .step(0.001)
+  .name("Intensity");
+pointLightFolder
+  .add(pointLight.position, "x")
+  .min(-5)
+  .max(5)
+  .step(0.001)
+  .name("X");
+pointLightFolder
+  .add(pointLight.position, "y")
+  .min(0.5)
+  .max(5)
+  .step(0.001)
+  .name("Y");
+pointLightFolder
+  .add(pointLight.position, "z")
+  .min(-5)
+  .max(5)
+  .step(0.001)
+  .name("Z");
+
+
+/*  BAKING SHADOWS
+
+A good alternative is to bake the shadows into the model. We integrate the shadow in the textures of the model as we apply materials.
+
+To learn this, I will disable the rendering of the shadow by disabling the renderer.shadowMap.enabled.
+
+Then, we will load the texture of the shadow and apply it to the model.
+Now, instead of the MeshStandardMaterial, we will use the MeshBasicMaterial on the plane with the bakedShadow texture.
+The main problem while baking the shadow is that the shadow is not dynamic. We cannot change the position of the light source or the position of the object, else the shadow will not be updated.
+
+*/
+
+/* BAKING SHADOW ALTERNATIVE
+
+We can use more simpler shadow texture and move it so that it stays under the sphere.
+To use this method, we need back the MeshStandardMaterial.
+
+To do this, we need to create a new plane above the floor (plane) and just below the sphere with and alphaMap and a simpleShadow.
+*/
+
+const shadowPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.5, 1.5),
+  new THREE.MeshBasicMaterial({
+    map: bakedShadow,
+    color: 0x000000,
+    transparent: true,
+    alphaMap: simpleShadow,
+    side: THREE.DoubleSide,
+  })
+);
+shadowPlane.position.y = plane.position.y + 0.01;
+shadowPlane.rotation.x = -Math.PI / 2;
+scene.add(shadowPlane);
 
 const camera = new THREE.PerspectiveCamera(
-  75,
+  50,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
 );
-camera.position.set(1, 1, 2);
+camera.position.set(1, 2.5, 3);
 scene.add(camera);
-
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -121,7 +298,9 @@ const renderer = new THREE.WebGLRenderer({ canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
+// renderer.shadowMap.enabled = true;
+
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const controls = new OrbitControls(camera, canvas);
@@ -131,6 +310,18 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  sphere.position.x = Math.cos(elapsedTime) * 1.5;
+  sphere.position.y = Math.abs(Math.sin(elapsedTime)) * 1.5;
+  sphere.position.z = Math.sin(elapsedTime) * 1.5;
+
+  // Update the shadow plane's position
+  shadowPlane.position.x = sphere.position.x;
+  shadowPlane.position.z = sphere.position.z;
+
+  // Updating the shadow opacity based on the sphere's position
+  shadowPlane.material.opacity = Math.abs(sphere.position.y - 1.5) / 1.5;
+
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
   controls.update();
