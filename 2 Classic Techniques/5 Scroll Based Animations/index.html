@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css">
+    <title>Scroll Based Animation</title>
+</head>
+<body class="bg-[#0C0D14] text-white">
+    <canvas class="webgl"></canvas>
+
+    <section class="section w-full md:max-w-[50%] flex flex-col items-center md:items-start justify-center translate-y-[-15%] md:translate-y-0 px-4 md:pl-20">
+        <div class="w-full md:max-w-2xl text-center md:text-left">
+            <h1 class="text-4xl md:text-8xl font-bold tracking-wider text-yellow-300 mb-4 md:mb-8">The Sun</h1>
+            <p class="text-lg md:text-2xl leading-relaxed text-yellow-100 opacity-90 backdrop-blur-sm bg-black/30 p-4 md:p-6 rounded-xl">
+                Our stellar neighbor, a massive ball of hydrogen and helium, 
+                burning at 27 million degrees Fahrenheit at its core. 
+                The Sun's powerful gravity holds the entire solar system together.
+            </p>
+        </div>
+    </section>
+
+    <section class="section w-full md:max-w-[50%] md:left-[50%] flex flex-col items-center md:items-start justify-center translate-y-[-15%] md:translate-y-0 px-4 md:pl-20">
+        <div class="w-full md:max-w-2xl md:ml-auto text-center md:text-left">
+            <h2 class="text-4xl md:text-8xl font-bold tracking-wider text-blue-400 mb-4 md:mb-8">The Earth</h2>
+            <p class="text-lg md:text-2xl leading-relaxed text-blue-100 opacity-90 backdrop-blur-sm bg-black/30 p-4 md:p-6 rounded-xl">
+                Our home planet, the only known world harboring life. 
+                Wrapped in clouds and oceans, Earth spins on its axis 
+                while completing its yearly dance around the Sun.
+            </p>
+        </div>
+    </section>
+
+    <section class="section w-full md:max-w-[50%] flex flex-col items-center md:items-start justify-center translate-y-[-15%] md:translate-y-0 px-4 md:pl-20">
+        <div class="w-full md:max-w-2xl text-center md:text-left">
+            <h2 class="text-4xl md:text-8xl font-bold tracking-wider text-gray-300 mb-4 md:mb-8">The Moon</h2>
+            <p class="text-lg md:text-2xl leading-relaxed text-gray-200 opacity-90 backdrop-blur-sm bg-black/30 p-4 md:p-6 rounded-xl">
+                Earth's faithful companion, controlling our tides and lighting up our nights. 
+                The Moon completes its orbit around Earth every 27.3 days, 
+                always showing us the same face.
+            </p>
+        </div>
+    </section>
+
+    <script type="module" src="/main.js"></script>
+    <script type="module" src="/lenis.js"></script>
+</body>
+</html>
