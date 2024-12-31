@@ -10,13 +10,101 @@ import "./style.css";
 const gui = new lil.GUI();
 
 // Creating a debugObject to store the debug options
-
 const debugObject = {};
 
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
 const scene = new THREE.Scene();
+
+// Tilting the scene to create a 3D effect
+scene.rotation.z = Math.PI * 0.2;
+const inverseSceneRotation = new THREE.Quaternion()
+  .copy(scene.quaternion)
+  .invert();
+
+/* Textures */
+
+const textureLoader = new THREE.TextureLoader();
+
+// Floor
+const floorTexture = textureLoader.load(
+  "/textures/floor/rocky_terrain_diff_1k.jpg"
+);
+const floorARMTexture = textureLoader.load(
+  "/textures/floor/rocky_terrain_arm_1k.jpg"
+);
+const floorNormalTexture = textureLoader.load(
+  "/textures/floor/rocky_terrain_nor_gl_1k.png"
+);
+const floorDisplacementTexture = textureLoader.load(
+  "/textures/floor/rocky_terrain_disp_1k.jpg"
+);
+
+// Wall
+const wallTexture = textureLoader.load(
+  "/textures/wall/castle_brick_broken_06_diff_1k.jpg"
+);
+const wallARMTexture = textureLoader.load(
+  "/textures/wall/castle_brick_broken_06_arm_1k.jpg"
+);
+const wallNormalTexture = textureLoader.load(
+  "/textures/wall/castle_brick_broken_06_nor_gl_1k.png"
+);
+const wallDisplacementTexture = textureLoader.load(
+  "/textures/wall/castle_brick_broken_06_disp_1k.jpg"
+);
+
+// Sphere
+const sphereTexture = textureLoader.load(
+  "/textures/sphere/cobblestone_floor_13_diff_1k.jpg"
+);
+const sphereARMTexture = textureLoader.load(
+  "/textures/sphere/cobblestone_floor_13_arm_1k.jpg"
+);
+const sphereNormalTexture = textureLoader.load(
+  "/textures/sphere/cobblestone_floor_13_nor_gl_1k.png"
+);
+const sphereDisplacementTexture = textureLoader.load(
+  "/textures/sphere/cobblestone_floor_13_disp_1k.jpg"
+);
+const sphereBumpTexture = textureLoader.load(
+  "/textures/sphere/cobblestone_floor_13_bump_1k.jpg"
+);
+
+// Cube
+const cubeTexture = textureLoader.load(
+  "/textures/cube/rock_wall_10_diff_1k.jpg"
+);
+const cubeARMTexture = textureLoader.load(
+  "/textures/cube/rock_wall_10_arm_1k.jpg"
+);
+const cubeNormalTexture = textureLoader.load(
+  "/textures/cube/rock_wall_10_nor_gl_1k.png"
+);
+const cubeDisplacementTexture = textureLoader.load(
+  "/textures/cube/rock_wall_10_disp_1k.jpg"
+);
+
+floorTexture.colorSpace = THREE.SRGBColorSpace;
+wallTexture.colorSpace = THREE.SRGBColorSpace;
+sphereTexture.colorSpace = THREE.SRGBColorSpace;
+cubeTexture.colorSpace = THREE.SRGBColorSpace;
+
+floorTexture.repeat.set(2, 2);
+wallTexture.repeat.set(2.5, 0.5);
+sphereTexture.repeat.set(1, 1);
+cubeTexture.repeat.set(5, 5);
+
+floorTexture.wrapS = THREE.RepeatWrapping;
+wallTexture.wrapS = THREE.RepeatWrapping;
+sphereTexture.wrapS = THREE.RepeatWrapping;
+cubeTexture.wrapS = THREE.RepeatWrapping;
+
+floorTexture.wrapT = THREE.RepeatWrapping;
+wallTexture.wrapT = THREE.RepeatWrapping;
+sphereTexture.wrapT = THREE.RepeatWrapping;
+cubeTexture.wrapT = THREE.RepeatWrapping;
 
 /* THEORY
 
@@ -77,12 +165,21 @@ We can listen to the collision events and play sounds when the bodies collide.
 
 // Setting the SAPBroadphase algorithm for better performance
 world.broadphase = new CANNON.SAPBroadphase(world);
-
 // Setting the sleeping of the bodies to true
 world.allowSleep = true;
 
-// Set the gravity of the physics world
-world.gravity.set(0, -9.82, 0);
+/* Function to update gravity */
+function updateGravity() {
+  // Create a gravity vector pointing down (along the negative Y-axis)
+  const gravityVector = new THREE.Vector3(0, -9.82, 0);
+  // Rotate the gravity vector using the inverse scene rotation
+  gravityVector.applyQuaternion(inverseSceneRotation);
+  // Set the rotated gravity vector in the physics world
+  world.gravity.set(gravityVector.x, gravityVector.y, gravityVector.z);
+}
+
+// Call updateGravity once initially to set the gravity
+updateGravity();
 
 // MATERIALS
 const defaultMaterial = new CANNON.Material("concrete");
@@ -105,6 +202,8 @@ world.defaultContactMaterial = defaultContactMaterial;
 
 /* Step 2 */
 
+const floorSize = 10;
+
 // Add a floor
 const floorShape = new CANNON.Plane();
 const floorBody = new CANNON.Body({
@@ -118,16 +217,21 @@ world.addBody(floorBody);
 // THREE.JS WORLD
 
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(10, 10),
+  new THREE.PlaneGeometry(floorSize, floorSize),
   new THREE.MeshStandardMaterial({
-    color: "#2a5674",
-    metalness: 0.6,
+    map: floorTexture,
+    aoMap: floorARMTexture,
+    normalMap: floorNormalTexture,
+    roughnessMap: floorARMTexture,
+    metalnessMap: floorARMTexture,
+    displacementMap: floorDisplacementTexture,
+    displacementScale: 0.05,
     roughness: 0.2,
-    envMapIntensity: 0.9,
     side: THREE.DoubleSide,
   })
 );
 floor.receiveShadow = true;
+floor.castShadow = true;
 floor.rotation.x = -Math.PI * 0.5;
 scene.add(floor);
 
@@ -141,7 +245,13 @@ const createWall = (width, height, depth, position, color) => {
   // Three.js wall
   const wallGeometry = new THREE.BoxGeometry(width, height, depth);
   const wallMaterial = new THREE.MeshStandardMaterial({
-    color: color,
+    map: wallTexture,
+    aoMap: wallARMTexture,
+    normalMap: wallNormalTexture,
+    displacementMap: wallDisplacementTexture,
+    roughnessMap: wallARMTexture,
+    metalnessMap: wallARMTexture,
+    displacementScale: 0,
     metalness: 0.6,
     roughness: 0.2,
   });
@@ -159,69 +269,60 @@ const createWall = (width, height, depth, position, color) => {
   });
   wallBody.position.copy(position);
   world.addBody(wallBody);
-
 };
 
 const createWallsAroundFloor = (floorSize) => {
-  if (typeof floorSize !== "number" || floorSize <= 0) {
-    console.error("Error: floorSize must be a positive number.");
-    return;
-  }
-
   const wallDepth = 0.2;
   const offset = 0.01;
-  const heightVariation = 0.001; // Small variation in wall height
+  const heightVariation = 0.001;
 
-  const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
+  const wallConfigurations = [
+    {
+      width: floorSize,
+      height: 2,
+      depth: wallDepth,
+      position: new THREE.Vector3(
+        0,
+        1 + heightVariation / 2,
+        floorSize / 2 + wallDepth / 2 + offset
+      ),
+      color: 0xff0000,
+    }, // Red wall
+    {
+      width: floorSize,
+      height: 2 - heightVariation,
+      depth: wallDepth,
+      position: new THREE.Vector3(
+        0,
+        1 - heightVariation / 2,
+        -floorSize / 2 - wallDepth / 2 - offset
+      ),
+      color: 0x00ff00,
+    }, // Green wall
+    {
+      width: wallDepth,
+      height: 2 + heightVariation,
+      depth: floorSize + 2 * wallDepth,
+      position: new THREE.Vector3(
+        floorSize / 2 + wallDepth / 2 + offset,
+        1 + heightVariation / 2,
+        0
+      ),
+      color: 0x0000ff,
+    }, // Blue wall
+  ];
 
-  // Create walls with slight height variations
-  createWall(
-    floorSize + 2 * wallDepth,
-    2 + heightVariation,
-    wallDepth,
-    new THREE.Vector3(
-      0,
-      1 + heightVariation / 2,
-      floorSize / 2 + wallDepth / 2 + offset
-    ),
-    colors[0]
-  ); // North wall (red)
-  createWall(
-    floorSize + 2 * wallDepth,
-    2 - heightVariation,
-    wallDepth,
-    new THREE.Vector3(
-      0,
-      1 - heightVariation / 2,
-      -floorSize / 2 - wallDepth / 2 - offset
-    ),
-    colors[1]
-  ); // South wall (green)
-  createWall(
-    wallDepth,
-    2 + heightVariation,
-    floorSize + 2 * wallDepth,
-    new THREE.Vector3(
-      floorSize / 2 + wallDepth / 2 + offset,
-      1 + heightVariation / 2,
-      0
-    ),
-    colors[2]
-  ); // East wall (blue)
-  createWall(
-    wallDepth,
-    2 - heightVariation,
-    floorSize + 2 * wallDepth,
-    new THREE.Vector3(
-      -floorSize / 2 - wallDepth / 2 - offset,
-      1 - heightVariation / 2,
-      0
-    ),
-    colors[3]
-  ); // West wall (yellow)
+  wallConfigurations.forEach((config) => {
+    createWall(
+      config.width,
+      config.height,
+      config.depth,
+      config.position,
+      config.color
+    );
+  });
 };
 
-const floorSize = 10;
 createWallsAroundFloor(floorSize);
 
 /* Creating a function to create a sphere */
@@ -229,28 +330,31 @@ createWallsAroundFloor(floorSize);
 // Sphere geometry and material
 const sphereGeometry = new THREE.SphereGeometry(0.5, 16, 16);
 const sphereMaterial = new THREE.MeshStandardMaterial({
-  metalness: 0.3,
-  roughness: 0.4,
+  metalness: 0.5,
+  roughness: 0.5,
 });
 
 const createSphere = (radius, position) => {
+
   // Three Js sphere
   const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial.clone());
   sphere.scale.set(radius, radius, radius);
 
+  sphere.material.map = sphereTexture;
+  sphere.material.aoMap = sphereARMTexture;
+  sphere.material.normalMap = sphereNormalTexture;
+  sphere.material.roughnessMap = sphereARMTexture;
+  sphere.material.metalnessMap = sphereARMTexture;
+  sphere.material.bumpMap = sphereBumpTexture;
+  sphere.material.displacementMap = sphereDisplacementTexture;
+  sphere.material.displacementScale = 0.05;
+
   sphere.castShadow = true;
+  sphere.receiveShadow = true;
   sphere.position.copy(position);
   scene.add(sphere);
 
-  // Generate random color using 0-255 range and normalize
-  const r = Math.random();
-  const g = Math.random();
-  const b = Math.random();
-  const randomColor = new THREE.Color(r, g, b);
-  sphere.material.color.copy(randomColor);
-
   // Physics world sphere
-
   const sphereBody = new CANNON.Body({
     mass: 1,
     shape: new CANNON.Sphere(radius * 0.5),
@@ -263,7 +367,7 @@ const createSphere = (radius, position) => {
 
   sphereBody.addEventListener("collide", (event) => {
     playHitSound(event);
-  })
+  });
 
   // Adding the sphere to the objects to update array
   objectsToUpdate.push({
@@ -273,28 +377,25 @@ const createSphere = (radius, position) => {
 };
 
 // Integrating the createSphere function with the debugger
-
 debugObject.createSphere = () => {
   // Adding randomness to the position and radius of the sphere
-  const radius = Math.random() + 0.3;
+  const radius = Math.random() * 0.5 + 0.5;
   const position = new THREE.Vector3(
-    (Math.random() - 0.5) * 9,
+    4,
     radius * 2 + 1,
     (Math.random() - 0.5) * 9
   );
   createSphere(radius, position);
 };
-gui.add(debugObject, "createSphere").name("Generate Sphere");
-
+gui.add(debugObject, "createSphere").name("Generate Sphere (A)");
 
 /* Creating a function to create a cube */
 
 // Cube Geometry and material
 const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 const cubeMaterial = new THREE.MeshStandardMaterial({
-  color: "#ff0000",
-  metalness: 0.6,
-  roughness: 0.2,
+  metalness: 0.05,
+  roughness: 0.3,
 });
 
 const createCube = (width, height, depth, position) => {
@@ -302,20 +403,24 @@ const createCube = (width, height, depth, position) => {
   const cube = new THREE.Mesh(cubeGeometry, cubeMaterial.clone());
   cube.scale.set(width, height, depth);
   cube.position.copy(position);
+  cube.castShadow = true;
+  cube.receiveShadow = true;
   scene.add(cube);
 
-  const r = Math.random();
-  const g = Math.random();
-  const b = Math.random();
-  const randomColor = new THREE.Color(r, g, b);
-  cube.material.color.copy(randomColor);
+  cube.material.map = cubeTexture;
+  cube.material.aoMap = cubeARMTexture;
+  cube.material.normalMap = cubeNormalTexture;
+  cube.material.displacementMap = cubeDisplacementTexture;
+  cube.material.metalnessMap = cubeARMTexture;
+  cube.material.roughnessMap = cubeARMTexture;
+  cube.material.displacementScale = 0.001;
 
   // Physics world cube
 
   // There is a special thing to note while creating boxes in cannon.js which is half-extents. This is the length between the center of the box and the edge of the box. So, while creating a box, we need to set the width, height and depth to be half of the actual width, height and depth of the three.js box.
 
   const cubeBody = new CANNON.Body({
-    mass: 1,
+    mass: 0.4,
     shape: new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2)),
     material: defaultMaterial,
   });
@@ -325,7 +430,7 @@ const createCube = (width, height, depth, position) => {
   // Integrating the hit sound with the createCube function
   cubeBody.addEventListener("collide", (event) => {
     playPlasticHitSound(event);
-  })
+  });
 
   // Adding the cube to the objects to update array
   objectsToUpdate.push({
@@ -336,18 +441,18 @@ const createCube = (width, height, depth, position) => {
 
 // Integrating the createCube function with the debugger
 debugObject.createCube = () => {
-  // Adding randomness to the position and size of the cube
+  // Adding randomness to the position and dimensions of the cube
   const width = Math.random() + 0.3;
   const height = Math.random() + 0.3;
   const depth = Math.random() + 0.3;
   const position = new THREE.Vector3(
-    (Math.random() - 0.5) * 9,
+    4,
     height * 2 + 1,
     (Math.random() - 0.5) * 9
   );
   createCube(width, height, depth, position);
 };
-gui.add(debugObject, "createCube").name("Generate Cube");
+gui.add(debugObject, "createCube").name("Generate Cube (D)");
 
 /* Sound */
 
@@ -364,23 +469,28 @@ const playHitSound = (collision) => {
   if (currentTime - lastSoundTime > soundCooldown && collisionStrength > 1.5) {
     lastSoundTime = currentTime;
     hitSound.currentTime = 0;
-    hitSound.volume = Math.min(1, (Math.random() * collisionStrength / 50) * 10); 
+    hitSound.volume = Math.min(
+      1,
+      ((Math.random() * collisionStrength) / 50) * 10
+    );
     hitSound.play();
   }
 };
 
-const playPlasticHitSound = (collision) => { // New function
+const playPlasticHitSound = (collision) => {
   const collisionStrength = collision.contact.getImpactVelocityAlongNormal();
   const currentTime = Date.now();
 
   if (currentTime - lastSoundTime > soundCooldown && collisionStrength > 1.5) {
     lastSoundTime = currentTime;
     plasticHitSound.currentTime = 0;
-    plasticHitSound.volume = Math.min(1, (Math.random() * collisionStrength / 50) * 10);
+    plasticHitSound.volume = Math.min(
+      1,
+      ((Math.random() * collisionStrength) / 50) * 10
+    );
     plasticHitSound.play();
   }
 };
-
 
 /* Removing the objects */
 
@@ -396,32 +506,64 @@ debugObject.reset = () => {
   }
   objectsToUpdate.length = 0;
 };
-gui.add(debugObject, "reset").name("Reset");
+gui.add(debugObject, "reset").name("Reset (R)");
 
+window.addEventListener("keyup", (event) => {
+  if (event.key === "a" || event.key === "ArrowLeft") {
+    debugObject.createSphere();
+  } else if (event.key === "d" || event.key === "ArrowRight") {
+    debugObject.createCube();
+  } else if (event.key === "r" || event.key === "ArrowUp") {
+    debugObject.reset();
+  }
+});
 
+const removeOutOfBoundsObjects = () => {
+  objectsToUpdate.forEach((object, index) => {
+    if (
+      object.physicsObject.position.x < -7 ||
+      object.physicsObject.position.x > 7 ||
+      object.physicsObject.position.z < -7 ||
+      object.physicsObject.position.z > 7 ||
+      object.physicsObject.position.y < -1 ||
+      object.physicsObject.position.y > 7
+    ) {
+      // Remove from physics world
+      world.removeBody(object.physicsObject);
+      // Remove from Three.js scene
+      scene.remove(object.threeJsObject);
+      // Remove from update array
+      objectsToUpdate.splice(index, 1);
+    }
+  });
+};
+
+objectsToUpdate.forEach((object) => {
+  object.physicsObject.sleepThreshold = 0.1;
+});
 
 const camera = new THREE.PerspectiveCamera(
-  50,
+  75,
   window.innerWidth / window.innerHeight,
   0.1,
   100
 );
-camera.position.set(-4, 4, 10);
+camera.position.set(-10, 7, 0);
 scene.add(camera);
 
 // Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.set(1024, 1024);
+directionalLight.shadow.mapSize.set(2048, 2048);
 directionalLight.shadow.camera.far = 15;
 directionalLight.shadow.camera.left = -7;
 directionalLight.shadow.camera.top = 7;
 directionalLight.shadow.camera.right = 7;
 directionalLight.shadow.camera.bottom = -7;
-directionalLight.position.set(5, 5, 5);
+directionalLight.position.set(-15, 20, 15);
 scene.add(directionalLight);
 
 const renderer = new THREE.WebGLRenderer({
@@ -435,6 +577,22 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+
+// Limit the vertical rotation (polar angle)
+controls.minPolarAngle = Math.PI * 0.2; // Minimum polar angle
+controls.maxPolarAngle = Math.PI * 0.8; // Maximum polar angle
+// Limit the zoom distance
+controls.minDistance = 5; // Minimum zoom distance
+controls.maxDistance = 15; // Maximum zoom distance
+
+// Prevent the camera from going below y = 0
+controls.addEventListener("change", () => {
+  if (camera.position.y < 0) {
+    camera.position.y = 0;
+    controls.target.y = 0; // Keep the target at y = 0
+    controls.update();
+  }
+});
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -453,8 +611,11 @@ const timer = new Timer();
 const tick = () => {
   timer.update();
   stats.update();
+  updateGravity();
   const elapsedTime = timer.getElapsed();
   const deltaTime = timer.getDelta();
+
+  console.log(camera.position);
 
   /* Step 3 - Updating the physical world
 
@@ -462,9 +623,9 @@ const tick = () => {
     1. A fixed time step which is the time difference between the current frame and the previous frame. This value is set to be 1/60 (60 frames per second)
     2. A delta time (the time difference between the current frame and the previous frame)
     3. How many iterations to catch up the potential delay between the physics world and the ThreeJs world. Generally, this value is set to be 3.
-    */
+  */
 
-  world.step(1 / 120, deltaTime, 10);
+  world.step(1 / 60, deltaTime, 3);
 
   /* Step 4 */
   // Updating the objects to update array
@@ -480,6 +641,7 @@ const tick = () => {
   // cannonDebugger.update();
 
   controls.update();
+  removeOutOfBoundsObjects();
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
