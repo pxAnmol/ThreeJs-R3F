@@ -615,8 +615,6 @@ const tick = () => {
   const elapsedTime = timer.getElapsed();
   const deltaTime = timer.getDelta();
 
-  console.log(camera.position);
-
   /* Step 3 - Updating the physical world
 
     In this method, we need to pass three arguments:
