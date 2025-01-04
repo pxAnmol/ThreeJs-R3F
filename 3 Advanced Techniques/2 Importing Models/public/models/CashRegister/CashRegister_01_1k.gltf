@@ -1,0 +1,339 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.6.16",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "CashRegister_01_body"
+    },
+    {
+      "mesh": 1,
+      "name": "CashRegister_011_drawer",
+      "translation": [
+        0,
+        0,
+        0.1835193932056427
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "CashRegister_01",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "name": "CashRegister_01_glass",
+      "normalTexture": {
+        "index": 3
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 4
+        },
+        "metallicRoughnessTexture": {
+          "index": 5
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cash_register",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        },
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1
+        }
+      ]
+    },
+    {
+      "name": "Cash_register.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    },
+    {
+      "sampler": 0,
+      "source": 5
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_nor_gl",
+      "uri": "textures/CashRegister_01_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_diff",
+      "uri": "textures/CashRegister_01_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_metallic-CashRegister_01_roughness",
+      "uri": "textures/CashRegister_01_arm_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_glass_nor_gl",
+      "uri": "textures/CashRegister_01_glass_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_glass_diff-CashRegister_01_glass_opacity",
+      "uri": "textures/CashRegister_01_glass_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "CashRegister_01_glass_metallic-CashRegister_01_glass_roughness",
+      "uri": "textures/CashRegister_01_glass_arm_1k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 7993,
+      "max": [
+        0.375308632850647,
+        0.6235355138778687,
+        0.2625770568847656
+      ],
+      "min": [
+        -0.22518207132816315,
+        0.002179764211177826,
+        -0.17349055409431458
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 7993,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 7993,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 26763,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 12,
+      "max": [
+        0.19196026027202606,
+        0.6097210049629211,
+        -0.02246727980673313
+      ],
+      "min": [
+        -0.15305203199386597,
+        0.5646552443504333,
+        -0.1453566998243332
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 12,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 18,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 1271,
+      "max": [
+        0.2278974950313568,
+        0.12868578732013702,
+        0.2671951651573181
+      ],
+      "min": [
+        -0.19286872446537018,
+        0.021781623363494873,
+        -0.060094937682151794
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 1271,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 1271,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5123,
+      "count": 3000,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 95916,
+      "byteOffset": 0
+    },
+    {
+      "buffer": 0,
+      "byteLength": 95916,
+      "byteOffset": 95916
+    },
+    {
+      "buffer": 0,
+      "byteLength": 63944,
+      "byteOffset": 191832
+    },
+    {
+      "buffer": 0,
+      "byteLength": 53526,
+      "byteOffset": 255776
+    },
+    {
+      "buffer": 0,
+      "byteLength": 144,
+      "byteOffset": 309304
+    },
+    {
+      "buffer": 0,
+      "byteLength": 144,
+      "byteOffset": 309448
+    },
+    {
+      "buffer": 0,
+      "byteLength": 96,
+      "byteOffset": 309592
+    },
+    {
+      "buffer": 0,
+      "byteLength": 36,
+      "byteOffset": 309688
+    },
+    {
+      "buffer": 0,
+      "byteLength": 15252,
+      "byteOffset": 309724
+    },
+    {
+      "buffer": 0,
+      "byteLength": 15252,
+      "byteOffset": 324976
+    },
+    {
+      "buffer": 0,
+      "byteLength": 10168,
+      "byteOffset": 340228
+    },
+    {
+      "buffer": 0,
+      "byteLength": 6000,
+      "byteOffset": 350396
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 356396,
+      "uri": "CashRegister_01.bin"
+    }
+  ]
+}
