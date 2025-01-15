@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mercedes-Benz 300sl Gullwing | www.vecarz.com
+* source:	https://sketchfab.com/3d-models/mercedes-benz-300sl-gullwing-wwwvecarzcom-65edd5814c9842bb9c769388d13fa27f
+* author:	Nic Cheung (https://sketchfab.com/heynic)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mercedes-Benz 300sl Gullwing | www.vecarz.com" (https://sketchfab.com/3d-models/mercedes-benz-300sl-gullwing-wwwvecarzcom-65edd5814c9842bb9c769388d13fa27f) by Nic Cheung (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
