@@ -21,8 +21,25 @@ const colorObject = {
   surfaceColor: '#9bd8ff',
 }
 
+const planeSettings = {
+  size: 10
+}
+
+const LODSettings = {
+  level: 3 // default to level 3 (256*256)
+}
+
+// Map LOD levels to segment counts
+const LODLevels = {
+  1: 64,
+  2: 128,
+  3: 256,
+  4: 512,
+  5: 1024
+}
+
 const plane = new THREE.Mesh(
-  new THREE.PlaneGeometry(3, 3, 512, 512),
+  new THREE.PlaneGeometry(planeSettings.size, planeSettings.size, 512, 512),
   new THREE.ShaderMaterial({
     side: THREE.DoubleSide,
     vertexShader,
@@ -31,12 +48,7 @@ const plane = new THREE.Mesh(
       uTime: { value: 0 },
       uWaveElevation: { value: 0.4 },
       uWaveFrequency: { value: new THREE.Vector2(4.0, 1.5) },
-      uWaveSpeed: { value: 0.75 },
-
-      uNoiseElevation: { value: 0.15 },
-      uNoiseFrequency: { value: 3.0 },
-      uNoiseSpeed: { value: 0.75 },
-      uNoiseIterations: { value: 4.0 },
+      uWaveSpeed: { value: 0.5 },
 
       uDepthColor: { value: new THREE.Color(colorObject.depthColor) },
       uSurfaceColor: { value: new THREE.Color(colorObject.surfaceColor) },
@@ -48,6 +60,32 @@ const plane = new THREE.Mesh(
 plane.rotation.x = -Math.PI * 0.5;
 scene.add(plane);
 
+gui.addBinding(planeSettings, 'size', {
+  min: 2.0,
+  max: 20,
+  step: 1.0,
+  label: "Plane Size"
+}).on('change', (ev) => {
+  plane.geometry = new THREE.PlaneGeometry(ev.value, planeSettings.size, 512, 512);
+});
+gui.addBinding(LODSettings, 'level', {
+  options: {
+    'Level 1 (64x64)': 1,
+    'Level 2 (128x128)': 2,
+    'Level 3 (256x256)': 3, 
+    'Level 4 (512x512)': 4,
+    'Level 5 (1024x1024)': 5
+  },
+  label: "Detail Level"
+}).on('change', (ev) => {
+  const segments = LODLevels[ev.value];
+  plane.geometry = new THREE.PlaneGeometry(
+    planeSettings.size, 
+    planeSettings.size, 
+    segments,
+    segments
+  );
+});
 gui.addBinding(plane.material.uniforms.uWaveElevation, 'value', {
   min: 0.1,
   max: 0.5,
@@ -60,29 +98,11 @@ gui.addBinding(plane.material.uniforms.uWaveFrequency, 'value', {
   step: 0.01,
   label: "Wave Frequency",
 });
-gui.addBinding(plane.material.uniforms.uNoiseElevation, 'value', {
+gui.addBinding(plane.material.uniforms.uWaveSpeed, 'value', {
   min: 0.1,
-  max: 1,
+  max: 1.5,
   step: 0.01,
-  label: "Noise Elevation",
-});
-gui.addBinding(plane.material.uniforms.uNoiseFrequency, 'value', {
-  min: 0.1,
-  max: 10,
-  step: 0.01,
-  label: "Noise Frequency",
-});
-gui.addBinding(plane.material.uniforms.uNoiseIterations, 'value', {
-  min: 1,
-  max: 10,
-  step: 1,
-  label: "Noise Iterations",
-});
-gui.addBinding(plane.material.uniforms.uNoiseSpeed, 'value', {
-  min: 0.1,
-  max: 10,
-  step: 0.01,
-  label: "Noise Speed",
+  label: "Wave Speed",
 });
 gui.addBinding(colorObject, 'depthColor', {
   view: 'color',
@@ -127,6 +147,9 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.45;
+controls.maxDistance = 25;
+controls.minDistance = 2
 
 window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);

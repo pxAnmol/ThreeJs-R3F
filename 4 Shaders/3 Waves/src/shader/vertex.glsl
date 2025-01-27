@@ -5,11 +5,6 @@ uniform float uWaveElevation;
 uniform vec2 uWaveFrequency;
 uniform float uWaveSpeed;
 
-uniform float uNoiseElevation;
-uniform float uNoiseFrequency;
-uniform float uNoiseSpeed;
-uniform float uNoiseIterations;
-
 varying float vElevation;
 
 
@@ -95,25 +90,36 @@ float noise(vec3 P){
 
 // Perlin noise code ends -
 
-void main(){
+void main() {
+    vec4 modelPosition = modelMatrix * vec4(position, 1.);
+    vec2 flowDirection = vec2(cos(uTime * 0.5), sin(uTime * 0.5));
     
-    vec4 modelPosition=modelMatrix*vec4(position,1.);
+    // Fluid dynamics base
+    float fluidFlow = dot(modelPosition.xz, flowDirection * uWaveSpeed);
     
-    float elevation=sin(modelPosition.x*uWaveFrequency.x+(uTime*uWaveSpeed))*sin(modelPosition.z*uWaveFrequency.y+(uTime*uWaveSpeed))*uWaveElevation;
+    // Energy propagation
+    float energyField = 0.0;
+    vec2 center = vec2(0.0);
+    float distFromCenter = length(modelPosition.xz - center);
     
-    // Applying a series of perlin noise adding to the elevation to create a small wavy effect on the current big waves
-
-    for(float i=1.0;i<uNoiseIterations;i++){
-        elevation+=abs(noise(vec3(modelPosition.xz * uNoiseFrequency * i,uTime * uNoiseSpeed)) * uNoiseElevation / i);
+    // Combining fluid dynamics with energy transfer
+    float elevation = sin(fluidFlow * 2.0 + uTime * uWaveSpeed) * (1.0 / (1.0 + distFromCenter));
+    
+    // Add turbulent flow patterns
+    for(float i = 1.0; i <= 3.0; i++) {
+        float turbulence = noise(vec3(
+            modelPosition.xz * i * 2.0 + flowDirection * uTime * uWaveSpeed,
+            uTime * uWaveSpeed * i * 0.5
+        ));
+        energyField += turbulence * (1.0 / i);
     }
     
-    vElevation=elevation;
+    elevation += energyField;
+    elevation *= uWaveElevation;
     
-    modelPosition.y+=elevation;
+    vElevation = elevation;
+    modelPosition.y += elevation;
     
-    vec4 viewPosition=viewMatrix*modelPosition;
-    vec4 projectedPosition=projectionMatrix*viewPosition;
-    gl_Position=projectedPosition;
-    
-    vUv=uv;
+    gl_Position = projectionMatrix * viewMatrix * modelPosition;
+    vUv = uv;
 }
