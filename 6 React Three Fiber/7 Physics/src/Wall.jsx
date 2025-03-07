@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { InstancedRigidBodies } from "@react-three/rapier";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { useControls } from "leva";
 
 function BoxModel({ scale = 1 }) {
   const { nodes, materials } = useGLTF("./models/box-com.glb");
   return {
     geometry: nodes.defaultMaterial.geometry,
     material: materials.None,
-    scale: [0.5 * scale, 0.5 * scale, 0.5 * scale],
+    scale: [1 * scale, 1 * scale, 1 * scale],
   };
 }
 
@@ -36,9 +37,9 @@ export default function Wall({
           result.push({
             key: `box-${row}-${col}-${height}`,
             position: [
-              position[0] + row * 1.2 - (rows * 1.2) / 2,
-              position[1] + (height * 1.2 + 0.8),
-              position[2] + col * 1.2 - (columns * 1.2) / 2,
+              position[0] + row * 2.2 - (rows * 2.2) / 2,
+              position[1] + (height * 3 + 0.8),
+              position[2] + col * 2.2 - (columns * 2.2) / 2,
             ],
             rotation: [
               rotation[0] + randomRotationX,
@@ -72,13 +73,31 @@ export default function Wall({
     mesh.instanceMatrix.needsUpdate = true;
   }, [instances, instancesCount]);
 
+  const physics = useControls('Physics Properties', {
+    mass: {
+      value: 1,
+      min: 1,
+      max: 10,
+      step: 1,
+      label: 'Mass'
+    },
+    restitution: {
+      value: 0.3,
+      min: 0,
+      max: 1,
+      step: 0.01,
+      label: 'Restitution'
+    },
+  })
+
   return (
     <>
       {/* InstancedRigidBodies for physics */}
       <InstancedRigidBodies
         ref={rigidBodiesRef}
         instances={instances}
-        restitution={0.2}
+        restitution={physics.restitution}
+        mass={physics.mass}
         friction={0.7}
         colliders="hull"
       >
@@ -86,8 +105,8 @@ export default function Wall({
         <instancedMesh
           ref={instancedMeshRef}
           args={[boxData.geometry, boxData.material, instancesCount]}
-          // castShadow
-          // receiveShadow
+          castShadow
+          receiveShadow
         />
       </InstancedRigidBodies>
     </>

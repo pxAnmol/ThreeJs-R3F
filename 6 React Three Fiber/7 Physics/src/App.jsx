@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Environment, OrbitControls, Grid, Center } from "@react-three/drei";
 import { Perf } from "r3f-perf";
+import { useControls } from "leva";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Wall from "./Wall";
 
@@ -32,9 +33,21 @@ To apply these things, we first need to access the mesh using the "useRef" hook 
 
 * Events - There are 4 major events that we can use to trigger actions on the object - onCollisionEnter, onCollisionExit, onSleep and onWake. We can use these events to trigger actions on the object when it collides with another object, when it sleeps or wakes up, etc.
 
+There are other things too like we can LockRotation, or create Joints between two objects, etc. which can be found in the documentation and implemented based on the project need.
+
 */
 
 const App = () => {
+  const { debugPhysics, showPerf } = useControls("General", {
+    showPerf: {
+      value: true,
+      label: "Monitor",
+    },
+    debugPhysics: {
+      value: false,
+      label: "Debug",
+    },
+  });
   return (
     <>
       <Grid
@@ -52,26 +65,30 @@ const App = () => {
       />
 
       {/* We can set or tweak the gravity of the physics world using the gravity prop on the Physics component. We can also se the gravity scale for each object to make it react different from the world's gravity. */}
-      <Physics gravity={[0, -9.81, 0]}>
+      <Physics
+        debug={debugPhysics}
+        gravity={[0, -9.81, 0]}
+        broadphase="SAP"
+      >
         <RigidBody colliders={null} type="fixed">
-          <CuboidCollider args={[50, 0.1, 50]} position={[0, 0, 0]} />
+          <CuboidCollider args={[40, 1, 40]} position={[0, -1, 0]} />
         </RigidBody>
 
         <Suspense>
           <Wall
-            position={[0, 0, 10]}
+            position={[0, 0, 5.5]}
             rows={4}
             columns={4}
             maxHeight={10}
-            scale={2}
+            scale={1}
           />
 
           <Wall
-            position={[0, 0, -10]}
+            position={[0, 0, -5.5]}
             rows={4}
             columns={4}
             maxHeight={10}
-            scale={2}
+            scale={1}
           />
         </Suspense>
 
@@ -83,7 +100,7 @@ const App = () => {
 
         <Environment preset="dawn" />
 
-        <Perf position="top-left" />
+        {showPerf && <Perf position="top-left" />}
       </Physics>
     </>
   );
