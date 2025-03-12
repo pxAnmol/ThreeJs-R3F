@@ -1,68 +1,71 @@
-import { Stars } from "@react-three/drei";
+import { Stars, Environment } from "@react-three/drei";
 import { Perf } from "r3f-perf";
 import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 import Player from "./Player";
+import { useFrame } from "@react-three/fiber";
 
-import Balls from "./components/Balls";
-import Bumper from "./components/Bumper";
-import Dominos from "./components/Dominos";
-import Gravity from "./components/Gravity";
-import Stairs from "./components/Stairs";
-import Tornado from "./components/Tornado";
+import Floor from "./Floor";
+import Ramp from "./Obstacles/Ramp";
+import Dominos from "./Obstacles/Dominos";
+import Stairs from "./Obstacles/Stairs";
+import Tornado from "./Obstacles/Tornado";
+import Balls from "./Obstacles/Balls";
+import TallStair from "./Obstacles/TallStairs";
 
 const App = () => {
+  useFrame((state) => {
+    const floor = state.scene.getObjectByName("floor");
+    if (floor) {
+      floor.material.uniforms.time.value = state.clock.elapsedTime;
+    }
+  });
+
   return (
-    <Physics>
-      <Stars
-        radius={100}
-        depth={50}
-        count={3000}
-        factor={4}
-        saturation={0.6}
-        fade
-        speed={1.5}
-      />
+    <>
+      <Physics>
+        <Stars
+          radius={100}
+          depth={50}
+          count={3000}
+          factor={4}
+          saturation={0}
+          fade
+          speed={1}
+        />
 
-      <Player position={[0, 2, 0]} friction={1} restitution={0.1} />
+        <Player position={[0, 3, 0]} friction={1} restitution={0.1} />
 
-      {/* Rigid Walls */}
-
-      <RigidBody type="fixed" restitution={0.7} friction={1}>
         {/* Floor */}
-        <CuboidCollider args={[30, 0.1, 30]} position={[0, -0.1, 0]} />
+        <Floor />
 
-        {/* Left and Right Walls */}
-        <CuboidCollider args={[0.1, 15, 30]} position={[-30, 15, 0]} />
-        <CuboidCollider args={[0.1, 15, 30]} position={[30, 15, 0]} />
+        <RigidBody type="fixed" restitution={0.7} friction={1}>
+          {/* Left and Right Walls */}
+          <CuboidCollider args={[0.1, 15, 30]} position={[-30, 15, 0]} />
+          <CuboidCollider args={[0.1, 15, 30]} position={[30, 15, 0]} />
+          {/* Front and Back Walls */}
+          <CuboidCollider args={[30, 15, 0.1]} position={[0, 15, -30]} />
+          <CuboidCollider args={[30, 15, 0.1]} position={[0, 15, 30]} />
+        </RigidBody>
 
-        {/* Front and Back Walls */}
-        <CuboidCollider args={[30, 15, 0.1]} position={[0, 15, -30]} />
-        <CuboidCollider args={[30, 15, 0.1]} position={[0, 15, 30]} />
-      </RigidBody>
+        <Dominos startPosition={[-15, 0.5, 3]} groupRotation={[0, Math.PI * 1.25, 0]} rotation={[0, Math.PI, 0]} count={20} />
 
-      <Dominos
-        startPosition={[-15, 1, 15]}
-        count={15}
-        groupRotation={[0, Math.PI / 4, 0]}
-      />
-      <Dominos startPosition={[5, 1, -20]} count={20} />
-      <Dominos startPosition={[-20, 1, 10]} count={12} />
-      <Stairs rotation={[0, Math.PI / 4, 0]} />
-      <Balls position={[-15, 1, -5]} />
+        <Tornado position={[10, 0, 15]} />
+        <Stairs position={[15, 0.5, 20]} rotation={[0, -Math.PI * 1.25, 0]} />
 
-      <Tornado />
-      <Gravity />
-      {Array(10)
-        .fill(null)
-        .map((_, i) => (
-          <Bumper key={i} position={[Math.sin(i) * 10, 2, Math.cos(i) * 10]} />
-        ))}
+        <Ramp position={[-7, 0, -7]} />
 
-      <Perf position="top-left" />
+        <TallStair
+          scale={1.25}
+          position={[-12, 0, 12]}
+          rotation={[0, -Math.PI / 1.5, 0]}
+        />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 10]} intensity={1} />
-    </Physics>
+        <Balls />
+
+        <Perf position="top-left" />
+        <Environment preset="dawn" resolution={256} blur={0.8} />
+      </Physics>
+    </>
   );
 };
 

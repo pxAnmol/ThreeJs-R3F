@@ -1,4 +1,4 @@
-import { StrictMode, useState, useEffect } from "react";
+import { StrictMode, useState, useEffect, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
@@ -60,7 +60,9 @@ const Experience = () => {
     >
       <Canvas camera={{ fov: 55, position: [2, 3, 5] }}>
         <color attach="background" args={["#1e1e1e"]} />
-        <App />
+        <Suspense>
+          <App />
+        </Suspense>
       </Canvas>
       <UI />
     </KeyboardControls>
